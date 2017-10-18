@@ -1,0 +1,6 @@
+C:\Info\7. semester\Par.Prog\Synopsis01\Synopsis01\bin\Debug\Synopsis01.exe.config
+C:\Info\7. semester\Par.Prog\Synopsis01\Synopsis01\bin\Debug\Synopsis01.exe
+C:\Info\7. semester\Par.Prog\Synopsis01\Synopsis01\bin\Debug\Synopsis01.pdb
+C:\Info\7. semester\Par.Prog\Synopsis01\Synopsis01\obj\Debug\Synopsis01.csprojResolveAssemblyReference.cache
+C:\Info\7. semester\Par.Prog\Synopsis01\Synopsis01\obj\Debug\Synopsis01.exe
+C:\Info\7. semester\Par.Prog\Synopsis01\Synopsis01\obj\Debug\Synopsis01.pdb
