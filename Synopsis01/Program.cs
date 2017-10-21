@@ -267,10 +267,12 @@ namespace Synopsis01
         static void Main(string[] args)
         {
             Random randNum = new Random();
-            int max = randNum.Next(1, 50);
+            int max = randNum.Next(20, 50);
             int[] random = new int[max];
             Console.WriteLine("Nr of elements: " + max);
-            random = GenerateRandom(max);
+            Statistics(max);
+
+            /*random = GenerateRandom(max);
             for (int i = 0; i < max; ++i)
             {
                 Console.WriteLine(random[i]);
@@ -378,10 +380,241 @@ namespace Synopsis01
                 Console.WriteLine(reversed[i]);
             }
 
+            int[] nearly = GenerateNearly(max);
+            for (int i = 0; i < max; i++)
+            {
+                Console.WriteLine(nearly[i]);
+            }
 
+            int[] few = GenerateFewUnique(max);
+            for (int i = 0; i < max; i++)
+            {
+                Console.WriteLine(few[i]);
+            }
+
+            */
 
             Console.ReadLine();
         }
+
+        public static void Statistics(int max)
+        {
+            int[] random = GenerateRandom(max);
+            int[] nearly = GenerateNearly(max);
+            int[] few = GenerateFewUnique(max);
+            int[] reversed = GenerateReversed(max);
+
+            Stopwatch stopwatch = new Stopwatch();
+
+            Console.WriteLine("Iput:   \tRand\tNear\tFew\tRev");
+
+            Console.Write("Merge Sort:\t");
+            int[] merge = random;
+            stopwatch.Start();
+            SortMerge(merge, 0, max - 1);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            merge = nearly;
+            stopwatch.Start();
+            SortMerge(merge, 0, max - 1);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            merge = few;
+            stopwatch.Start();
+            SortMerge(merge, 0, max - 1);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            merge = reversed;
+            stopwatch.Start();
+            SortMerge(merge, 0, max - 1);
+            stopwatch.Stop();
+            Console.WriteLine(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+
+            Console.Write("Insertion:\t");
+            int[] ins = random;
+            stopwatch.Start();
+            InsertSort(ins, max);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            ins = nearly;
+            stopwatch.Start();
+            InsertSort(ins, max);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            ins = few;
+            stopwatch.Start();
+            InsertSort(ins, max);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            ins = reversed;
+            stopwatch.Start();
+            InsertSort(ins, max);
+            stopwatch.Stop();
+            Console.WriteLine(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+
+            Console.Write("RecInsert:\t");
+            int[] recins = random;
+            stopwatch.Start();
+            insertionSortRecursive(recins, max);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            recins = nearly;
+            stopwatch.Start();
+            insertionSortRecursive(recins, max);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            recins = few;
+            stopwatch.Start();
+            insertionSortRecursive(recins, max);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            recins = reversed;
+            stopwatch.Start();
+            insertionSortRecursive(recins, max);
+            stopwatch.Stop();
+            Console.WriteLine(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            Console.Write("BubbleSort:\t");
+            int[] bubble = random;
+            stopwatch.Start();
+            BubbleSort(bubble);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            bubble = nearly;
+            stopwatch.Start();
+            BubbleSort(bubble);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            bubble = few;
+            stopwatch.Start();
+            BubbleSort(bubble);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            bubble = reversed;
+            stopwatch.Start();
+            BubbleSort(bubble);
+            stopwatch.Stop();
+            Console.WriteLine(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            Console.Write("RecBubble:\t");
+            int[] recb = random;
+            stopwatch.Start();
+            RecursiveBubbleSort(recb, max);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            recb = nearly;
+            stopwatch.Start();
+            RecursiveBubbleSort(recb, max);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            recb = few;
+            stopwatch.Start();
+            RecursiveBubbleSort(recb, max);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            recb = reversed;
+            stopwatch.Start();
+            RecursiveBubbleSort(recb, max);
+            stopwatch.Stop();
+            Console.WriteLine(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            Console.Write("QuickSort:\t");
+            int[] quick = random;
+            stopwatch.Start();
+            Quicksort(quick, 0, quick.Length - 1);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            quick = nearly;
+            stopwatch.Start();
+            Quicksort(quick, 0, quick.Length - 1);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            quick = few;
+            stopwatch.Start();
+            Quicksort(quick, 0, quick.Length - 1);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            quick = reversed;
+            stopwatch.Start();
+            Quicksort(quick, 0, quick.Length - 1);
+            stopwatch.Stop();
+            Console.WriteLine(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            Console.Write("HeapSort:\t");
+            int[] heap = random;
+            stopwatch.Start();
+            heapSort(heap, max);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            heap = nearly;
+            stopwatch.Start();
+            heapSort(heap, max);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            heap = few;
+            stopwatch.Start();
+            heapSort(heap, max);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            heap = reversed;
+            stopwatch.Start();
+            heapSort(heap, max);
+            stopwatch.Stop();
+            Console.WriteLine(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+
+        } 
 
         public static int[] GenerateRandom(int size)
         {
@@ -399,13 +632,31 @@ namespace Synopsis01
 
         public static int[] GenerateNearly(int size)
         {
+            Random randNum = new Random();
             int[] arr = new int[size];
+            for(int i = 0; i < size; ++i)
+            {
+                if(i % 4 == 0)
+                {
+                    arr[i] = randNum.Next(0, 500);
+                }
+                else
+                {
+                    arr[i] = i;
+                }
+                
+            }
             return arr;
         }
 
         public static int[] GenerateFewUnique(int size)
         {
+            Random randNum = new Random();
             int[] arr = new int[size];
+            for(int i = 0; i < size; ++i)
+            {
+                arr[i] = randNum.Next(0, size / 4);
+            }
             return arr;
         }
         public static int[] GenerateReversed(int size)
