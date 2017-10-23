@@ -39,18 +39,32 @@ namespace Synopsis01
             }
         }
 
-        static public void SortMerge(int[] numbers, int left, int right)
+        static public void SortMerge(int[] numbers, int left, int right, int depthRemaining)
         {
             int mid;
 
             if (right > left)
             {
                 mid = (right + left) / 2;
-                SortMerge(numbers, left, mid);
-                SortMerge(numbers, (mid + 1), right);
+                if(depthRemaining > 0)
+                {
+                    Parallel.Invoke(
+                    () => SortMerge(numbers, left, mid, depthRemaining - 1), 
+                    () => SortMerge(numbers, (mid + 1), right, depthRemaining - 1));
+                }
+                else
+                {
+                    SortMerge(numbers, left, mid, 0);
+                    SortMerge(numbers, (mid + 1), right, 0);
+                }
+                
 
                 MainMerge(numbers, left, (mid + 1), right);
             }
+        }
+        static public void SortMerge(int[] numbers, int left, int right)
+        {
+            SortMerge(numbers, left, right, (int)Math.Log(Environment.ProcessorCount, 2)+4);
         }
 
         static public void InsertSort(int[] numarray, int max)
@@ -156,6 +170,11 @@ namespace Synopsis01
                     Parallel.Invoke(
                     () => Quicksort(input, low, pivot_loc - 1, depthRemaining - 1),
                     () => Quicksort(input, pivot_loc + 1, high, depthRemaining - 1));
+                }
+                else
+                {
+                    Quicksort(input, low, pivot_loc - 1, 0);
+                    Quicksort(input, pivot_loc + 1, high, 0);
                 }
             }
         }
@@ -277,7 +296,7 @@ namespace Synopsis01
         static void Main(string[] args)
         {
             Random randNum = new Random();
-            int max = randNum.Next(10000, 10000);
+            int max = randNum.Next(20, 50);
             int[] random = new int[max];
             Console.WriteLine("Nr of elements: " + max);
             Statistics(max);
