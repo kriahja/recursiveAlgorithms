@@ -142,16 +142,26 @@ namespace Synopsis01
             RecursiveBubbleSort(arr, n - 1);
         }
 
-        private static void Quicksort(int[] input, int low, int high)
+        private static void Quicksort(int[] input, int low, int high, int depthRemaining)
         {
             int pivot_loc = 0;
 
             if (low < high)
             {
                 pivot_loc = partition(input, low, high);
-                Quicksort(input, low, pivot_loc - 1);
-                Quicksort(input, pivot_loc + 1, high);
+                if (depthRemaining > 0)
+                {
+                    //Tasks are created dynamically with recursive call;
+                    //if the array is large, many tasks might be created.
+                    Parallel.Invoke(
+                    () => Quicksort(input, low, pivot_loc - 1, depthRemaining - 1),
+                    () => Quicksort(input, pivot_loc + 1, high, depthRemaining - 1));
+                }
             }
+        }
+        private static void Quicksort(int[] input, int low, int high)
+        {
+            Quicksort(input, low, high, (int)Math.Log(Environment.ProcessorCount));
         }
 
         private static int partition(int[] input, int low, int high)
@@ -267,7 +277,7 @@ namespace Synopsis01
         static void Main(string[] args)
         {
             Random randNum = new Random();
-            int max = randNum.Next(20, 50);
+            int max = randNum.Next(10000, 10000);
             int[] random = new int[max];
             Console.WriteLine("Nr of elements: " + max);
             Statistics(max);
