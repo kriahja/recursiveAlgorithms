@@ -46,10 +46,10 @@ namespace Synopsis01
             if (right > left)
             {
                 mid = (right + left) / 2;
-                if(depthRemaining > 0)
+                if (depthRemaining > 0)
                 {
                     Parallel.Invoke(
-                    () => SortMerge(numbers, left, mid, depthRemaining - 1), 
+                    () => SortMerge(numbers, left, mid, depthRemaining - 1),
                     () => SortMerge(numbers, (mid + 1), right, depthRemaining - 1));
                 }
                 else
@@ -57,14 +57,14 @@ namespace Synopsis01
                     SortMerge(numbers, left, mid, 0);
                     SortMerge(numbers, (mid + 1), right, 0);
                 }
-                
+
 
                 MainMerge(numbers, left, (mid + 1), right);
             }
         }
         static public void SortMerge(int[] numbers, int left, int right)
         {
-            SortMerge(numbers, left, right, (int)Math.Log(Environment.ProcessorCount, 2)+4);
+            SortMerge(numbers, left, right, (int)Math.Log(Environment.ProcessorCount));
         }
 
         static public void InsertSort(int[] numarray, int max)
@@ -86,6 +86,7 @@ namespace Synopsis01
                 }
             }
         }
+
 
         public static void insertionSortRecursive(int[] arr, int n)
         {
@@ -178,10 +179,15 @@ namespace Synopsis01
                 }
             }
         }
+
+
+
         private static void Quicksort(int[] input, int low, int high)
         {
-            Quicksort(input, low, high, (int)Math.Log(Environment.ProcessorCount));
+            Quicksort(input, low, high, (int)Math.Log(Environment.ProcessorCount, 2) + 4);
         }
+
+
 
         private static int partition(int[] input, int low, int high)
         {
@@ -200,13 +206,129 @@ namespace Synopsis01
             return i + 1;
         }
 
+        static public void InsertSort_quickHelper(int[] numarray, int start, int end)
+        {
+            for (int i = start + 1; i < end; i++)
+            {
+                int val = numarray[i];
 
+                int j = i - 1;
+                while (j >= 0 && val < numarray[j])
+                {
+                    numarray[j + 1] = numarray[j];
+                    j--;
+
+                }
+                numarray[j + 1] = val;
+            }
+        }
+
+
+
+
+        private static void OptiQuicksort(int[] array, int from, int to, int depthRemaining)
+        {
+            int Threshold = 30;
+            if (to - from <= Threshold)
+            {
+                InsertSort_quickHelper(array, from, to);
+            }
+            else
+            {
+                int pivot = from + (to - from) / 2;
+                pivot = Optipartition(array, from, to, pivot);
+
+                if (depthRemaining > 0)
+                {
+                    try
+                    {
+                        Parallel.Invoke(
+                          () =>
+                          {
+                              OptiQuicksort(array, from, pivot, depthRemaining - 1);
+                          },
+
+                          () =>
+                          {
+                              OptiQuicksort(array, pivot + 1, to, depthRemaining - 1);
+                          });
+                    }
+                    catch (AggregateException ae)
+                    {
+                        ae.Handle(e =>
+                        {
+                            if (e is StackOverflowException
+                             || e is OutOfMemoryException)
+                            {
+                                Console.WriteLine("Entered to high number.");
+                                return true;
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        });
+                    }
+                }
+
+                else
+                {
+                    try
+                    {
+
+                        OptiQuicksort(array, from, pivot, 0);
+                        OptiQuicksort(array, pivot + 1, to, 0);
+                    }
+                    catch (AggregateException ae)
+                    {
+                        ae.Handle(e =>
+                        {
+                            if (e is StackOverflowException
+                             || e is OutOfMemoryException)
+                            {
+                                Console.WriteLine("Entered to high number.");
+                                return true;
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        });
+                    }
+                }
+                
+            }
+        }
+
+        private static int Optipartition(int[] input, int low, int high, int pivot)
+        {
+            pivot = 0;
+            int i = low - 1;
+
+            for (int j = low; j < high; j++)
+            {
+                if (input[j] <= pivot)
+                {
+                    i++;
+                    swap(input, i, j);
+                }
+            }
+            swap(input, i + 1, high);
+            return i + 1;
+        }
+
+        private static void OptiProcessQuicksort(int[] input, int low, int high)
+        {
+            OptiQuicksort(input, low, high, (int)Math.Log(Environment.ProcessorCount, 2) + 4);
+        }
 
         private static void swap(int[] ar, int a, int b)
         {
+  
             int temp = ar[a];
             ar[a] = ar[b];
             ar[b] = temp;
+            
         }
 
         public static int[] CountingSort(int[] array)
@@ -293,135 +415,13 @@ namespace Synopsis01
             }
         }
 
-        static void Main(string[] args)
+        static void Main1(string[] args)
         {
             Random randNum = new Random();
-            int max = randNum.Next(20, 50);
+            int max = randNum.Next(1500, 1500);
             int[] random = new int[max];
             Console.WriteLine("Nr of elements: " + max);
             Statistics(max);
-
-            /*random = GenerateRandom(max);
-            for (int i = 0; i < max; ++i)
-            {
-                Console.WriteLine(random[i]);
-            }
-
-            int[] numbers = new int[max];
-            numbers = random;
-           
-            int[] merge = numbers;
-            Console.WriteLine("\nMergeSort By Recursive Method:");
-
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            SortMerge(merge, 0, max - 1);
-            stopwatch.Stop();
-            for (int i = 0; i < max; i++)
-                Console.WriteLine(merge[i]);
-            Console.WriteLine("Elapsed: " + stopwatch.Elapsed);
-            stopwatch.Reset();
-
-            int[] insertion = numbers;
-            stopwatch.Start();
-            InsertSort(insertion, max);
-            stopwatch.Stop();
-            Console.Write("\nInsertionSort:\n");
-            for (int i = 0; i < max; i++)
-            { 
-                Console.Write(insertion[i]);
-                Console.Write("\n");
-            }
-            Console.WriteLine("Elapsed: " + stopwatch.Elapsed);
-            stopwatch.Reset();
-
-            int[] recinsertion = numbers;
-            stopwatch.Start();
-            insertionSortRecursive(recinsertion, max);
-            stopwatch.Stop();
-            Console.Write("\nRecursiveInsertionSort:\n");
-            for (int i = 0; i < max; i++)
-            {
-                Console.Write(recinsertion[i]);
-                Console.Write("\n");
-            }
-            Console.WriteLine("Elapsed: " + stopwatch.Elapsed);
-            stopwatch.Reset();
-
-            int[] bubble = numbers;
-            stopwatch.Start();
-            BubbleSort(bubble);
-            stopwatch.Stop();
-            Console.WriteLine("BubbleSort:");
-            for(int i = 0; i < max; i++)
-            {
-                Console.WriteLine(bubble[i]);
-            }
-            Console.WriteLine("Elapsed: " + stopwatch.Elapsed);
-            stopwatch.Reset();
-
-            int[] recbubble = numbers;
-            stopwatch.Start();
-            RecursiveBubbleSort(recbubble, max);
-            stopwatch.Stop();
-            Console.WriteLine("RecursiveBubbleSort:");
-            for (int i = 0; i < max; i++)
-            {
-                Console.WriteLine(recbubble[i]);
-            }
-            Console.WriteLine("Elapsed: " + stopwatch.Elapsed);
-            stopwatch.Reset();
-
-            int[] quick = numbers;
-            Console.WriteLine("QuickSort By Recursive Method");
-            stopwatch.Start();
-            Quicksort(quick, 0, quick.Length - 1);
-            stopwatch.Stop();
-            for (int i = 0; i < max; i++)
-                Console.WriteLine(quick[i]);
-            Console.WriteLine("Elapsed: " + stopwatch.Elapsed);
-            stopwatch.Reset();
-
-            Console.WriteLine("CountingSort:");
-            stopwatch.Start();
-            int[] counting = CountingSort(numbers);
-            stopwatch.Stop();
-            for (int i = 0; i < max; i++)
-                Console.WriteLine(counting[i]);
-            Console.WriteLine("Elapsed: " + stopwatch.Elapsed);
-            stopwatch.Reset();
-
-            Console.WriteLine("HeapSort:");
-            stopwatch.Start();
-            int[] heap = numbers;
-
-            int n = heap.Length;
-
-            heapSort(heap, n);
-            for (int i = 0; i < max; i++)
-                Console.WriteLine(heap[i]);
-            Console.WriteLine("Elapsed: " + stopwatch.Elapsed);
-            stopwatch.Reset();
-
-            int[] reversed = GenerateReversed(max);
-            for(int i = 0; i < max; i++)
-            {
-                Console.WriteLine(reversed[i]);
-            }
-
-            int[] nearly = GenerateNearly(max);
-            for (int i = 0; i < max; i++)
-            {
-                Console.WriteLine(nearly[i]);
-            }
-
-            int[] few = GenerateFewUnique(max);
-            for (int i = 0; i < max; i++)
-            {
-                Console.WriteLine(few[i]);
-            }
-
-            */
 
             Console.ReadLine();
         }
@@ -467,35 +467,63 @@ namespace Synopsis01
             stopwatch.Reset();
 
 
-            Console.Write("Insertion:\t");
-            int[] ins = random;
+            Console.Write("OptiQuickSort:\t");
+            int[] oquick = random;
             stopwatch.Start();
-            InsertSort(ins, max);
+            OptiProcessQuicksort(oquick, 0, oquick.Length - 1);
             stopwatch.Stop();
             Console.Write(stopwatch.Elapsed.Ticks + "\t");
             stopwatch.Reset();
 
-            ins = nearly;
+            oquick = nearly;
             stopwatch.Start();
-            InsertSort(ins, max);
+            OptiProcessQuicksort(oquick, 0, oquick.Length - 1);
             stopwatch.Stop();
             Console.Write(stopwatch.Elapsed.Ticks + "\t");
             stopwatch.Reset();
 
-            ins = few;
+            oquick = few;
             stopwatch.Start();
-            InsertSort(ins, max);
+            OptiProcessQuicksort(oquick, 0, oquick.Length - 1);
             stopwatch.Stop();
             Console.Write(stopwatch.Elapsed.Ticks + "\t");
             stopwatch.Reset();
 
-            ins = reversed;
+            oquick = reversed;
             stopwatch.Start();
-            InsertSort(ins, max);
+            OptiProcessQuicksort(oquick, 0, oquick.Length - 1);
             stopwatch.Stop();
             Console.WriteLine(stopwatch.Elapsed.Ticks + "\t");
             stopwatch.Reset();
 
+            Console.Write("Insertion Q:\t");
+            int[] qins = random;
+            stopwatch.Start();
+            InsertSort_quickHelper(ins, 0, max);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            qins = nearly;
+            stopwatch.Start();
+            InsertSort_quickHelper(ins, 0, max);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            qins = few;
+            stopwatch.Start();
+            InsertSort_quickHelper(ins, 0, max);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            qins = reversed;
+            stopwatch.Start();
+            InsertSort_quickHelper(ins, 0, max);
+            stopwatch.Stop();
+            Console.WriteLine(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
 
             Console.Write("RecInsert:\t");
             int[] recins = random;
@@ -584,35 +612,34 @@ namespace Synopsis01
             Console.WriteLine(stopwatch.Elapsed.Ticks + "\t");
             stopwatch.Reset();
 
-            Console.Write("QuickSort:\t");
-            int[] quick = random;
+            Console.Write("Insertion:\t");
+            int[] ins = random;
             stopwatch.Start();
-            Quicksort(quick, 0, quick.Length - 1);
+            InsertSort(ins, max);
             stopwatch.Stop();
             Console.Write(stopwatch.Elapsed.Ticks + "\t");
             stopwatch.Reset();
 
-            quick = nearly;
+            ins = nearly;
             stopwatch.Start();
-            Quicksort(quick, 0, quick.Length - 1);
+            InsertSort(ins, max);
             stopwatch.Stop();
             Console.Write(stopwatch.Elapsed.Ticks + "\t");
             stopwatch.Reset();
 
-            quick = few;
+            ins = few;
             stopwatch.Start();
-            Quicksort(quick, 0, quick.Length - 1);
+            InsertSort(ins, max);
             stopwatch.Stop();
             Console.Write(stopwatch.Elapsed.Ticks + "\t");
             stopwatch.Reset();
 
-            quick = reversed;
+            ins = reversed;
             stopwatch.Start();
-            Quicksort(quick, 0, quick.Length - 1);
+            InsertSort(ins, max);
             stopwatch.Stop();
             Console.WriteLine(stopwatch.Elapsed.Ticks + "\t");
             stopwatch.Reset();
-
             Console.Write("HeapSort:\t");
             int[] heap = random;
             stopwatch.Start();
@@ -642,8 +669,37 @@ namespace Synopsis01
             Console.WriteLine(stopwatch.Elapsed.Ticks + "\t");
             stopwatch.Reset();
 
+            Console.Write("QuickSort:\t");
+            int[] quick = random;
+            stopwatch.Start();
+            Quicksort(quick, 0, quick.Length - 1);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
 
-        } 
+            quick = nearly;
+            stopwatch.Start();
+            Quicksort(quick, 0, quick.Length - 1);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            quick = few;
+            stopwatch.Start();
+            Quicksort(quick, 0, quick.Length - 1);
+            stopwatch.Stop();
+            Console.Write(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+            quick = reversed;
+            stopwatch.Start();
+            Quicksort(quick, 0, quick.Length - 1);
+            stopwatch.Stop();
+            Console.WriteLine(stopwatch.Elapsed.Ticks + "\t");
+            stopwatch.Reset();
+
+
+        }
 
         public static int[] GenerateRandom(int size)
         {
@@ -663,9 +719,9 @@ namespace Synopsis01
         {
             Random randNum = new Random();
             int[] arr = new int[size];
-            for(int i = 0; i < size; ++i)
+            for (int i = 0; i < size; ++i)
             {
-                if(i % 4 == 0)
+                if (i % 4 == 0)
                 {
                     arr[i] = randNum.Next(0, 500);
                 }
@@ -673,7 +729,7 @@ namespace Synopsis01
                 {
                     arr[i] = i;
                 }
-                
+
             }
             return arr;
         }
@@ -682,7 +738,7 @@ namespace Synopsis01
         {
             Random randNum = new Random();
             int[] arr = new int[size];
-            for(int i = 0; i < size; ++i)
+            for (int i = 0; i < size; ++i)
             {
                 arr[i] = randNum.Next(0, size / 4);
             }
@@ -691,7 +747,7 @@ namespace Synopsis01
         public static int[] GenerateReversed(int size)
         {
             int[] arr = new int[size];
-            for(int i = 0; i < size; ++i)
+            for (int i = 0; i < size; ++i)
             {
                 arr[i] = size - i;
             }

@@ -7,3 +7,6 @@ C:\Info\7. semester\Par.Prog\Synopsis01\Synopsis01\obj\Debug\Synopsis01.pdb
 C:\PBA\Parallel programming\Synopsis01\Synopsis01\bin\Debug\Synopsis01.exe.config
 C:\PBA\Parallel programming\Synopsis01\Synopsis01\obj\Debug\Synopsis01.exe
 C:\PBA\Parallel programming\Synopsis01\Synopsis01\obj\Debug\Synopsis01.pdb
+C:\PBA\Parallel programming\Synopsis01\Synopsis01\bin\Debug\Synopsis01.exe
+C:\PBA\Parallel programming\Synopsis01\Synopsis01\bin\Debug\Synopsis01.pdb
+C:\PBA\Parallel programming\Synopsis01\Synopsis01\obj\Debug\Synopsis01.csprojResolveAssemblyReference.cache
