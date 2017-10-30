@@ -499,28 +499,28 @@ namespace Synopsis01
             Console.Write("Insertion Q:\t");
             int[] qins = random;
             stopwatch.Start();
-            InsertSort_quickHelper(ins, 0, max);
+            InsertSort_quickHelper(qins, 0, max);
             stopwatch.Stop();
             Console.Write(stopwatch.Elapsed.Ticks + "\t");
             stopwatch.Reset();
 
             qins = nearly;
             stopwatch.Start();
-            InsertSort_quickHelper(ins, 0, max);
+            InsertSort_quickHelper(qins, 0, max);
             stopwatch.Stop();
             Console.Write(stopwatch.Elapsed.Ticks + "\t");
             stopwatch.Reset();
 
             qins = few;
             stopwatch.Start();
-            InsertSort_quickHelper(ins, 0, max);
+            InsertSort_quickHelper(qins, 0, max);
             stopwatch.Stop();
             Console.Write(stopwatch.Elapsed.Ticks + "\t");
             stopwatch.Reset();
 
             qins = reversed;
             stopwatch.Start();
-            InsertSort_quickHelper(ins, 0, max);
+            InsertSort_quickHelper(qins, 0, max);
             stopwatch.Stop();
             Console.WriteLine(stopwatch.Elapsed.Ticks + "\t");
             stopwatch.Reset();

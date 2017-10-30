@@ -11,6 +11,76 @@ namespace Synopsis01
     {
         private static int THRESHOLD = 100;
 
+        static public void MergeSort_Divide(int[] numbers, int left, int right, int depthRemaining)
+        {
+            int mid;
+            if (left - right <= THRESHOLD)
+            {
+                InsertionSort(numbers, left, right);
+            }
+            else
+            {
+                mid = (right + left) / 2;
+                if (depthRemaining > 0)
+                {
+                    try
+                    {
+                        var t1 = Task.Factory.StartNew(
+                            () => MergeSort_Divide(numbers, left, mid, depthRemaining - 1),
+                            TaskCreationOptions.AttachedToParent);
+                        var t2 = Task.Factory.StartNew(
+                            () => MergeSort_Divide(numbers, (mid + 1), right, depthRemaining - 1),
+                            TaskCreationOptions.AttachedToParent);
+                        Task.WaitAll(t1, t2);
+                    }
+                    catch (AggregateException ae)
+                    {
+                        foreach (var e in ae.InnerExceptions)
+                        {
+                            // Handle the custom exception.
+                            if (e is CustomException)
+                            {
+                                Console.WriteLine(e.Message);
+                            }
+                            // Rethrow any other exception.
+                            else
+                            {
+                                throw;
+                            }
+                        }
+                    }
+
+                }
+                else
+                {
+                    try
+                    {
+                        MergeSort_Divide(numbers, left, mid, 0);
+                        MergeSort_Divide(numbers, (mid + 1), right, 0);
+                    }
+                    catch (AggregateException ae)
+                    {
+                        foreach (var e in ae.InnerExceptions)
+                        {
+                            // Handle the custom exception.
+                            if (e is CustomException)
+                            {
+                                Console.WriteLine(e.Message);
+                            }
+                            // Rethrow any other exception.
+                            else
+                            {
+                                throw;
+                            }
+                        }
+                    }
+                }
+
+
+                MergeSort_Conquer(numbers, left, (mid + 1), right);
+            }
+        }
+
         static public void MergeSort_Conquer(int[] numbers, int left, int mid, int right)
         {
             int[] temp = new int[numbers.Length];
@@ -41,74 +111,10 @@ namespace Synopsis01
             }
         }
 
-        static public void MergeSort_Divide(int[] numbers, int left, int right, int depthRemaining)
-        {
-            int mid;
-            if (left - right <= THRESHOLD)
-            {
-                InsertionSort(numbers, left, right);
-            }
-            else { 
-                mid = (right + left) / 2;
-                if (depthRemaining > 0)
-                {
-                    try
-                    { 
-                    Parallel.Invoke(
-                    () => MergeSort_Divide(numbers, left, mid, depthRemaining - 1),
-                    () => MergeSort_Divide(numbers, (mid + 1), right, depthRemaining - 1));
-                    }
-                    catch (AggregateException ae)
-                    {
-                        ae.Handle(e =>
-                        {
-                            if (e is StackOverflowException
-                             || e is OutOfMemoryException)
-                            {
-                                Console.WriteLine("Entered to high number.");
-                                return true;
-                            }
-                            else
-                            {
-                                return false;
-                            }
-                        });
-                    }
-
-                }
-                else
-                {
-                    try
-                    {
-
-                    
-                    MergeSort_Divide(numbers, left, mid, 0);
-                    MergeSort_Divide(numbers, (mid + 1), right, 0);
-                    }
-                    catch (AggregateException ae)
-                    {
-                        ae.Handle(e =>
-                        {
-                            if (e is StackOverflowException
-                             || e is OutOfMemoryException) 
-                            {
-                                Console.WriteLine("Entered to high number.");
-                                return true;
-                            }
-                            else
-                            {
-                                return false;
-                            }
-                        });
-                    }
-                }
-
-
-                MergeSort_Conquer(numbers, left, (mid + 1), right);
-            }
-        }
+        
         static public void ProcessCalc_MergeSort(int[] numbers, int left, int right)
         {
+            // ,2) + 4) if you want to do 16x the processor count, depending on system.
             MergeSort_Divide(numbers, left, right, (int)Math.Log(Environment.ProcessorCount));
         }
 
@@ -146,15 +152,8 @@ namespace Synopsis01
                     try
                     {
                         Parallel.Invoke(
-                          () =>
-                          {
-                              Parallel_QuickSort(array, from, pivot, depthRemaining - 1);
-                          },
-
-                          () =>
-                          {
-                              Parallel_QuickSort(array, pivot + 1, to, depthRemaining - 1);
-                          });
+                          () => Parallel_QuickSort(array, from, pivot, depthRemaining - 1),
+                          () => Parallel_QuickSort(array, pivot + 1, to, depthRemaining - 1));
                     }
                     catch (AggregateException ae)
                     {
@@ -222,7 +221,8 @@ namespace Synopsis01
 
         private static void ProcessCalc_QuickSort(int[] input, int low, int high)
         {
-            Parallel_QuickSort(input, low, high, (int)Math.Log(Environment.ProcessorCount, 2) + 4);
+            // ,2) + 4) if you want to do 16x the processor count, depending on system.
+            Parallel_QuickSort(input, low, high, (int)Math.Log(Environment.ProcessorCount));
         }
 
         private static void swap(int[] ar, int a, int b)
